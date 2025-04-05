@@ -6,20 +6,20 @@ import PrivateRoute from './components/PrivateRoute';
 import { BrowserRouter } from 'react-router-dom';
 
 
-createRoot(document.getElementById('root')).render(
-  
-  <StrictMode>
-    <BrowserRouter>
-      <PrivateRoute>
-        <App />
-      </PrivateRoute>
-      </BrowserRouter>
-  </StrictMode>
-);
-
-
 // createRoot(document.getElementById('root')).render(
+  
 //   <StrictMode>
-//     <App />
-//   </StrictMode>,
-// )
+//     <BrowserRouter>
+//       <PrivateRoute>
+//         <App />
+//       </PrivateRoute>
+//       </BrowserRouter>
+//   </StrictMode>
+// );
+
+
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+)
