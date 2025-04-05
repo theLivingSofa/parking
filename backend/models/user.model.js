@@ -13,6 +13,10 @@ const logSchema = new mongoose.Schema({
         type: Number, // in hours
         required: true,
     },
+    amount: {
+        type: Number, // 💸 Add this line
+        required: true,
+    },
 }, { _id: false }); // Prevents automatic creation of _id in logs array
 
 const userSchema = new mongoose.Schema({
