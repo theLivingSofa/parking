@@ -79,63 +79,83 @@ export const checkIn = async (req, res) => {
 
 export const checkOut = async (req, res) => {
     try {
-        const { qrcodeUrl } = req.body
+        const { qrcodeUrl } = req.body;
 
         if (!qrcodeUrl) {
-            return res.status(400).json({ message: "url is required" })
+            return res.status(400).json({ message: "url is required" });
         }
 
-        const userData = await decodeQRCode(qrcodeUrl)
-
-
-        const user = await userModel.findOne({ l_no: userData.l_no })
+        const userData = await decodeQRCode(qrcodeUrl);
+        const user = await userModel.findOne({ l_no: userData.l_no });
 
         if (!user) {
-            return res.status(400).json({ message: "user is not found" })
+            return res.status(400).json({ message: "user is not found" });
         }
 
-        user.status = false,
-            user.checkOut = new Date()
-
-        let rate;
-        const diffInMs = user.checkOut - user.checkIn; // Milliseconds
-        const hrs = diffInMs / (1000 * 60 * 60); // Convert to hours
-
-        if (hrs > 0) {
-            rate = 20 * hrs;
+        if (!user.checkIn) {
+            return res.status(400).json({ message: "No check-in record found" });
         }
 
-        console.log("rate", rate)
-        await user.save()
-        return res.status(200).json({ message: "User is check-out", rate: rate })
+        const checkOutTime = new Date();
+        const checkInTime = user.checkIn;
+        const diffInMs = checkOutTime - checkInTime;
+        const hrs = diffInMs / (1000 * 60 * 60);
+        const rate = 20 * hrs;
+
+        // Push this session to logs
+        user.logs.push({
+            checkIn: checkInTime,
+            checkOut: checkOutTime,
+            duration: hrs,
+        });
+
+        // Update user status
+        user.status = false;
+        user.checkOut = checkOutTime;
+        user.checkIn = null; // Clear the checkIn timestamp for future reuse
+
+        await user.save();
+
+        return res.status(200).json({
+            message: "User is check-out",
+            rate: rate,
+        });
 
     } catch (error) {
-        console.log("error while check-in", error.message)
-        return res.status(500).json({ message: "Internal Server Error", error: error.message })
+        console.log("error while check-out", error.message);
+        return res.status(500).json({ message: "Internal Server Error", error: error.message });
     }
-}
+};
+
 
 
 export const checkStatus = async (req, res) => {
     try {
-        const { qrcodeUrl } = req.body
+        const { qrcodeUrl } = req.body;
 
         if (!qrcodeUrl) {
-            return res.status(400).json({ message: "url is required" })
+            return res.status(400).json({ message: "url is required" });
         }
 
-        const userData = await decodeQRCode(qrcodeUrl)
-        console.log("userdata", userData)
-
-        const user = await userModel.findOne({ l_no: userData.l_no })
+        const userData = await decodeQRCode(qrcodeUrl);
+        const user = await userModel.findOne({ l_no: userData.l_no });
 
         if (!user) {
-            return res.status(400).json({ message: "user is not found" })
+            return res.status(400).json({ message: "user is not found" });
         }
 
-        res.status(200).json({ status: user })
+        return res.status(200).json({
+            name: user.name,
+            license_plate: user.l_no,
+            phone: user.p_no,
+            isParked: user.status,
+            currentCheckIn: user.checkIn || null,
+            logs: user.logs || []
+        });
+
     } catch (error) {
-        console.log("error while checking status", error.message)
-        return res.status(500).json({ message: "Internal Server Error", error: error.message })
+        console.log("error while checking status", error.message);
+        return res.status(500).json({ message: "Internal Server Error", error: error.message });
     }
-}
+};
+

@@ -1,37 +1,54 @@
-import mongoose  from "mongoose";
+import mongoose from "mongoose";
+
+const logSchema = new mongoose.Schema({
+    checkIn: {
+        type: Date,
+        required: true,
+    },
+    checkOut: {
+        type: Date,
+        required: true,
+    },
+    duration: {
+        type: Number, // in hours
+        required: true,
+    },
+}, { _id: false }); // Prevents automatic creation of _id in logs array
 
 const userSchema = new mongoose.Schema({
-    name : {
-        type : String,
-        required : true
+    name: {
+        type: String,
+        required: true
     },
-    l_no : {
-        type : String,
-        required : true,
+    l_no: {
+        type: String,
+        required: true,
         unique: true,
     },
-    p_no : {
-        type : String,
-        required : true
+    p_no: {
+        type: String,
+        required: true
     },
-    status : {
-        type : Boolean,
+    status: {
+        type: Boolean,
+        default: false
     },
-    qrcodeUrl : {
-        type : String,
+    qrcodeUrl: {
+        type: String,
     },
-    balanceLeft : {
-        type : Number
+    balanceLeft: {
+        type: Number,
+        default: 0
     },
-    checkIn : {
-        type : Date
+    checkIn: {
+        type: Date
     },
-    checkOut : {
-        type : Date
-    }
-},{timestamps : true})
+    checkOut: {
+        type: Date
+    },
+    logs: [logSchema] // Array of log objects
+}, { timestamps: true });
 
+const userModel = mongoose.model('user', userSchema);
 
-const userModel =  mongoose.model('user',userSchema)
-
-export default userModel
+export default userModel;
