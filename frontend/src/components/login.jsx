@@ -44,10 +44,10 @@
 import React from "react";
 import { auth, provider } from "../firebase";
 import { signInWithPopup } from "firebase/auth";
-import { useHistory } from "react-router-dom"; // For redirection
+import { useNavigate } from "react-router-dom"; // Use useNavigate instead of useHistory
 
 function Login() {
-  const history = useHistory(); // React Router hook for navigation
+  const navigate = useNavigate(); // Initialize useNavigate hook
 
   const handleLogin = async () => {
     try {
@@ -68,7 +68,7 @@ function Login() {
       localStorage.setItem("token", token);
 
       // Redirect to the protected route
-      history.push("/dashboard"); // Or the route you want to redirect to
+      navigate("/dashboard"); // Redirect to a protected page
     } catch (error) {
       console.error("Login Error:", error);
       alert("Login failed. Please try again.");
