@@ -57,7 +57,7 @@ export const checkIn = async (req, res) => {
 
         const userData = await decodeQRCode(qrcodeUrl)
 
-        const user = await userModel.findOne({ p_no: userData.p_no })
+        const user = await userModel.findOne({ l_no: userData.l_no })
 
         if (!user) {
             return res.status(400).json({ message: "user is not found" })
@@ -88,7 +88,7 @@ export const checkOut = async (req, res) => {
         const userData = await decodeQRCode(qrcodeUrl)
 
 
-        const user = await userModel.findOne({ p_no: userData.p_no })
+        const user = await userModel.findOne({ l_no: userData.l_no })
 
         if (!user) {
             return res.status(400).json({ message: "user is not found" })
@@ -127,7 +127,7 @@ export const checkStatus = async (req, res) => {
         const userData = await decodeQRCode(qrcodeUrl)
         console.log("userdata", userData)
 
-        const user = await userModel.findOne({ p_no: userData.p_no })
+        const user = await userModel.findOne({ l_no: userData.l_no })
 
         if (!user) {
             return res.status(400).json({ message: "user is not found" })
