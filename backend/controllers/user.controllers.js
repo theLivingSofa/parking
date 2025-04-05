@@ -15,10 +15,10 @@ export const register = async (req, res) => {
             res.status(400).json({ message: "l_no is required" })
         }
 
-        const userExits = await userModel.findOne({p_no : p_no})
+        const userExits = await userModel.findOne({l_no : l_no})
 
         if(userExits){
-            return res.status(400).json({message : "user already exits"})
+            return res.status(400).json({message : "License plate already exits"})
         }
 
         let url = await generateQrCode(name, p_no)
