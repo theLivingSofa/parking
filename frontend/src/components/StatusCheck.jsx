@@ -498,7 +498,7 @@ function StatusCheck() {
         />
         <button
           onClick={handleManualCheck}
-          className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700"
+          className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700"
         >
           Check
         </button>
