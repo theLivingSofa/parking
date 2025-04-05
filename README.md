@@ -1,6 +1,6 @@
 # 🚗 QR Code Based Parking Management System
 
-A modern and efficient **Web-Based Parking Management System** that allows vehicle check-ins and check-outs using **QR codes**. Built using **FastAPI** (Python) for the backend, **MongoDB Atlas** for the database, and **React** for the frontend interface.
+A modern and efficient **Web-Based Parking Management System** that allows vehicle check-ins and check-outs using **QR codes**. Built using **JavaScript** for the backend, **MongoDB Atlas** for the database, and **React** for the frontend interface.
 
 ---
 
@@ -20,7 +20,7 @@ A modern and efficient **Web-Based Parking Management System** that allows vehic
 | Layer         | Technology         |
 |---------------|--------------------|
 | Frontend      | React + TailwindCSS |
-| Backend       | FastAPI (Python)   |
+| Backend       | Javascript   |
 | Database      | MongoDB Atlas      |
 | Deployment    | Fly.io (FastAPI backend) |
 
@@ -29,9 +29,8 @@ A modern and efficient **Web-Based Parking Management System** that allows vehic
 ## 🧰 Requirements
 
 - Node.js ≥ 16.x
-- Python ≥ 3.9
+- React ≥ 18.x
 - MongoDB Atlas account
-- Fly.io account
 - A browser with webcam access for scanning QR codes
 
 ---
@@ -41,63 +40,12 @@ A modern and efficient **Web-Based Parking Management System** that allows vehic
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/qr-parking-management.git
-cd qr-parking-management
+git clone https://github.com/theLivingSofa/parking.git
+cd parking
 ```
 
 ---
 
-### 2. Backend Setup (FastAPI)
-
-#### ➤ Create and activate a virtual environment
-
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows use venv\Scripts\activate
-```
-
-#### ➤ Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-#### ➤ Environment variables
-
-Create a `.env` file in the backend directory:
-
-```env
-MONGO_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/yourDB?retryWrites=true&w=majority
-```
-
-#### ➤ Run the server
-
-```bash
-uvicorn main:app --reload
-```
-
----
-
-### 3. Frontend Setup (React)
-
-```bash
-cd client
-npm install
-```
-
-Create a `.env` file in the `client` directory:
-
-```env
-VITE_BACKEND_URL=http://localhost:8000
-```
-
-Then run the app:
-
-```bash
-npm run dev
-```
-
----
 
 ## ✨ Functionality
 
@@ -171,14 +119,10 @@ Use this from **MongoDB Atlas > Browse Collections > MONGOSH**.
 
 ## 📦 Deployment
 
-### Backend: [Fly.io](https://fly.io)
+### Backend: [Railway](https://railway.com)
 
-```bash
-flyctl launch
-flyctl deploy
-```
 
-### Frontend: (Recommended) [Vercel](https://vercel.com) or [Netlify](https://netlify.com)
+### Frontend: (Recommended) [Vercel](https://vercel.com) 
 
 Update `VITE_BACKEND_URL` in frontend `.env` accordingly after deployment.
 
@@ -198,7 +142,7 @@ Update `VITE_BACKEND_URL` in frontend `.env` accordingly after deployment.
 **Ayush Agrawal**  
 📍 Pune, India  
 👨‍🎓 BCA @ MIT-WPU  
-📫 [LinkedIn](https://linkedin.com/in/your-profile) | [GitHub](https://github.com/your-username)
+📫 [LinkedIn](https://linkedin.com/in/ayushagrawal733) | [GitHub](https://github.com/theLivingSofa)
 
 ---
 
