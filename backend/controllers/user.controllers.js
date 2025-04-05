@@ -177,31 +177,42 @@ export const checkOut = async (req, res) => {
 
 
 // Check current status of a user
+// Check current status of a user
 export const checkStatus = async (req, res) => {
-  try {
-    const { qrcodeUrl } = req.body;
-
-    if (!qrcodeUrl) {
-      return res.status(400).json({ message: "QR code URL is required" });
+    try {
+      const { qrcodeUrl, l_no } = req.body;
+  
+      let user;
+  
+      // Prioritize QR Code if provided
+      if (qrcodeUrl) {
+        const userData = await decodeQRCode(qrcodeUrl);
+        user = await userModel.findOne({ l_no: userData.l_no });
+      } 
+      // Fallback to manual license number
+      else if (l_no) {
+        user = await userModel.findOne({ l_no });
+      } 
+      // Neither provided
+      else {
+        return res.status(400).json({ message: "Either QR code or License number is required" });
+      }
+  
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+  
+      return res.status(200).json({
+        name: user.name,
+        license_plate: user.l_no,
+        phone: user.p_no,
+        isParked: user.status,
+        currentCheckIn: user.checkIn || null,
+        logs: user.logs || [],
+      });
+    } catch (error) {
+      console.log("Error while checking status", error.message);
+      return res.status(500).json({ message: "Internal Server Error", error: error.message });
     }
-
-    const userData = await decodeQRCode(qrcodeUrl);
-    const user = await userModel.findOne({ l_no: userData.l_no });
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    return res.status(200).json({
-      name: user.name,
-      license_plate: user.l_no,
-      phone: user.p_no,
-      isParked: user.status,
-      currentCheckIn: user.checkIn || null,
-      logs: user.logs || [],
-    });
-  } catch (error) {
-    console.log("Error while checking status", error.message);
-    return res.status(500).json({ message: "Internal Server Error", error: error.message });
-  }
-};
+  };
+  
