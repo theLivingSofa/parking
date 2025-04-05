@@ -404,8 +404,10 @@ function StatusCheck() {
                 {status.logs.map((log, idx) => (
                   <li key={idx}>
                     In: {new Date(log.checkIn).toLocaleString()} → Out:{' '}
-                    {log.checkOut ? new Date(log.checkOut).toLocaleString() : 'N/A'} (
-                    {log.duration?.toFixed(2) ?? '0'} hrs)
+                    {log.checkOut ? new Date(log.checkOut).toLocaleString() : 'N/A'}
+                    {log.duration?.toFixed(2) ?? '0'} hrs
+                    {log.amount ? ` — ₹${log.amount}` : ''}
+
                   </li>
                 ))}
               </ul>
