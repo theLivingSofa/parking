@@ -22,7 +22,7 @@ A modern and efficient **Web-Based Parking Management System** that allows vehic
 | Frontend      | React + TailwindCSS |
 | Backend       | Javascript   |
 | Database      | MongoDB Atlas      |
-| Deployment    | Fly.io (FastAPI backend) |
+| Deployment    | Railway & Vercel |
 
 ---
 
