@@ -37,7 +37,8 @@ function App() {
             <div className="flex">
               <div className="flex-shrink-0 flex items-center">
                 <QrScanner className="h-8 w-8 text-indigo-600" />
-                <span className="ml-2 text-xl font-bold text-gray-900">Parking System</span>
+                {/* <span className="ml-2 text-xl font-bold text-gray-900">Parking System</span> */}
+                <a href="https://parking-mit.vercel.app/dashboard" className="ml-2 text-xl font-bold text-gray-900 hover:text-indigo-600 transition-colors" >Parking System </a>
               </div>
             </div>
           </div>
