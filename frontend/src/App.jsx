@@ -36,7 +36,9 @@ function App() {
           <div className="flex justify-between h-16">
             <div className="flex">
               <div className="flex-shrink-0 flex items-center">
-                <QrScanner className="h-8 w-8 text-indigo-600" />
+                {/* <QrScanner className="h-8 w-8 text-indigo-600" /> */}
+                <a href="https://parking-mit.vercel.app/dashboard" className="inline-block" // Optional: Add classes for layout if needed for the link itself
+                ><QrScanner className="h-8 w-8 text-indigo-600 hover:text-indigo-800 transition-colors" /> {/* Your Icon Component - Added hover */}</a>
                 {/* <span className="ml-2 text-xl font-bold text-gray-900">Parking System</span> */}
                 <a href="https://parking-mit.vercel.app/dashboard" className="ml-2 text-xl font-bold text-gray-900 hover:text-indigo-600 transition-colors" >Parking System </a>
               </div>
