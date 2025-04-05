@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema({
     l_no : {
         type : String,
         required : true,
+        unique: true,
     },
     p_no : {
         type : String,
