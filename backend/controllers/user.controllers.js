@@ -21,7 +21,7 @@ export const register = async (req, res) => {
             return res.status(400).json({message : "License plate already exits"})
         }
 
-        let url = await generateQrCode(name, p_no)
+        let url = await generateQrCode(name, p_no, l_no)
 
         const user = await userModel.create({
             name,
