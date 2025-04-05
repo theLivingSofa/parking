@@ -49,32 +49,36 @@ export const register = async (req, res) => {
 
 export const checkIn = async (req, res) => {
     try {
-        const { qrcodeUrl } = req.body
+        const { qrcodeUrl } = req.body;
 
         if (!qrcodeUrl) {
-            return res.status(400).json({ message: "url is required" })
+            return res.status(400).json({ message: "QR code URL is required" });
         }
 
-        const userData = await decodeQRCode(qrcodeUrl)
-
-        const user = await userModel.findOne({ l_no: userData.l_no })
+        const userData = await decodeQRCode(qrcodeUrl);
+        const user = await userModel.findOne({ l_no: userData.l_no });
 
         if (!user) {
-            return res.status(400).json({ message: "user is not found" })
+            return res.status(404).json({ message: "User not found" });
         }
 
-        user.status = true,
-            user.checkIn = new Date()
+        if (user.status === true && user.checkIn) {
+            return res.status(400).json({ message: "User is already checked in" });
+        }
 
-        await user.save()
+        user.status = true;
+        user.checkIn = new Date();
 
-        return res.status(200).json({ message: "User is check-in" })
+        await user.save();
+
+        return res.status(200).json({ message: "User has successfully checked in" });
 
     } catch (error) {
-        console.log("error while check-in", error.message)
-        return res.status(500).json({ message: "Internal Server Error", error: error.message })
+        console.error("Error during check-in:", error.message);
+        return res.status(500).json({ message: "Internal Server Error", error: error.message });
     }
-}
+};
+
 
 
 export const checkOut = async (req, res) => {
