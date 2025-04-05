@@ -208,8 +208,14 @@ export const checkStatus = async (req, res) => {
         phone: user.p_no,
         isParked: user.status,
         currentCheckIn: user.checkIn || null,
-        logs: user.logs || [],
+        logs: user.logs.map(log => ({
+          checkIn: log.checkIn,
+          checkOut: log.checkOut,
+          duration: log.duration,
+          amount: log.amount, 
+        })) || [],
       });
+      
     } catch (error) {
       console.log("Error while checking status", error.message);
       return res.status(500).json({ message: "Internal Server Error", error: error.message });
