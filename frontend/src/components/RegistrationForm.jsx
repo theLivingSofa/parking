@@ -68,7 +68,7 @@ function RegistrationForm() {
                   value={formData.name}
                   onChange={handleChange}
                   className="pl-10 p-2 w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  placeholder="John Doe"
+                  placeholder="Eg. John Doe"
                 />
               </div>
             </div>
@@ -87,7 +87,7 @@ function RegistrationForm() {
                   value={formData.p_no}
                   onChange={handleChange}
                   className="pl-10 p-2 w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  placeholder="+1 (555) 000-0000"
+                  placeholder="Eg. 9876543210"
                 />
               </div>
             </div>
@@ -106,7 +106,7 @@ function RegistrationForm() {
                   value={formData.l_no}
                   onChange={handleChange}
                   className="pl-10 p-2 w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  placeholder="ABC-123"
+                  placeholder="Eg. MH12AB1234"
                 />
               </div>
             </div>
