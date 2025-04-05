@@ -344,7 +344,7 @@ function RegistrationForm() {
 
     const downloadLink = document.createElement('a');
     downloadLink.href = qrCode;
-    downloadLink.download = `qr-code-${formData.name}.png`;
+    downloadLink.download = `qr-code-${formData.l_no}.png`;
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
