@@ -351,40 +351,41 @@ function RegistrationForm() {
   };
 
   const printQR = () => {
-    const printWindow = window.open('', '', 'width=300,height=600');
+    const printWindow = window.open('', '', 'width=300,height=300');
   
     printWindow.document.write(`
       <html>
         <head>
           <title>Print QR Code</title>
           <style>
-            @media print {
-              body {
-                width: 58mm;
-                margin: 0;
-                padding: 0;
-                font-family: Arial, sans-serif;
-                text-align: center;
-              }
-              h3 {
-                font-size: 14px;
-                margin: 10px 0 5px;
-              }
-              p {
-                font-size: 12px;
-                margin: 0 0 10px;
-              }
-              img {
-                width: 150px;
-                height: 150px;
-                margin-bottom: 10px;
-              }
+            @page {
+              size: 80mm 80mm;
+              margin: 0;
+            }
+  
+            html, body {
+              margin: 0;
+              padding: 0;
+              width: 80mm;
+              height: 80mm;
+            }
+  
+            body {
+              display: flex;
+              justify-content: center;
+              align-items: center;
+            }
+  
+            img {
+              width: 100%;
+              height: auto;
+              max-width: 80mm;
+              max-height: 80mm;
+              display: block;
             }
           </style>
         </head>
         <body>
-          <h3>${formData.name}</h3>
-          <p>${formData.l_no}</p>
           <img src="${qrCode}" alt="QR Code" />
         </body>
       </html>
@@ -392,9 +393,14 @@ function RegistrationForm() {
   
     printWindow.document.close();
     printWindow.focus();
-    printWindow.print();
-    printWindow.close();
+  
+    // Delay to ensure QR is loaded before printing
+    printWindow.onload = () => {
+      printWindow.print();
+      printWindow.close();
+    };
   };
+  
   
 
   return (
