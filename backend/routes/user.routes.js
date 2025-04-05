@@ -13,7 +13,8 @@
 
 import express from "express";
 import { register, checkIn, checkOut, checkStatus } from "../controllers/user.controllers.js";
-import verifyToken from "./verifyToken"; // Import the middleware
+import verifyToken from "../verifyToken.js";
+ // Import the middleware
 
 const router = express.Router();
 
