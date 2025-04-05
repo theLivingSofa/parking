@@ -15,14 +15,21 @@ A modern and efficient **Web-Based Parking Management System** that allows vehic
 
 ---
 
+
+## 🌐 Live Deployment
+- **Frontend**: Hosted on [Vercel](https://vercel.com/)
+- **Backend**: Hosted on [Railway](https://railway.app/)
+- **Database**: MongoDB Atlas (Cloud)
+
+---
+
 ## 🛠️ Tech Stack
 
-| Layer         | Technology         |
-|---------------|--------------------|
-| Frontend      | React + TailwindCSS |
-| Backend       | Javascript   |
-| Database      | MongoDB Atlas      |
-| Deployment    | Railway & Vercel |
+| Frontend      | Backend   | Database      |
+|---------------|-----------|---------------|
+| React         | Express   | MongoDB       |
+| Tailwind CSS  | Node.js   | Mongoose      |
+| QR Code Lib   | Axios     | --            |
 
 ---
 
@@ -35,58 +42,25 @@ A modern and efficient **Web-Based Parking Management System** that allows vehic
 
 ---
 
-## 🚀 Getting Started
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/theLivingSofa/parking.git
-cd parking
-```
-
----
-
-
 ## ✨ Functionality
 
-### ✅ Register Vehicle
+### ✅ Vehicle Registration
+- Enter user details (name, phone, license number)
+- Generates a unique QR code containing relevant data
+- Supports **QR code download** and **thermal printing** (80mm x 80mm)
 
-- Endpoint: `/api/register`
-- Method: `POST`
-- Fields: `l_no`, `name`, `p_no`
-- Auto-generates a QR code
+### 📤 QR Code Printing
+- Print directly from the browser interface
+- Optimized thermal printer support with specific formatting
+- Page size: **80mm × 80mm** square layout for optimal printing
 
----
-
-### 📥 Vehicle Check-In
-
-- Scan QR → POST to `/api/checkin`
-- Updates:
-  - `status: true`
-  - `checkIn: <timestamp>`
-  - Appends log
-
----
-
-### 📤 Vehicle Check-Out
-
-- Scan QR → POST to `/api/checkout`
-- Updates:
-  - `status: false`
-  - `checkOut: <timestamp>`
-  - Calculates fee
-  - Appends log
-
----
-
-### 🔍 Vehicle Status Check
-
-- Scan QR → POST to `/api/status`
-- Returns:
-  - Owner name, contact
-  - Status
-  - Check-in/out time
-  - Parking history
+### 📲 Check-In / Check-Out / Status
+- Users can scan their QR code using the webcam via the interface
+- Alternatively, enter the license plate manually for status checks or operations
+- Displays:
+    - Owner details associated with the vehicle
+    - Current status (Checked In / Checked Out / Not Registered)
+    * (Optional based on implementation) Visit history (in/out times, duration, fee)
 
 ---
 
@@ -117,16 +91,6 @@ Use this from **MongoDB Atlas > Browse Collections > MONGOSH**.
 
 ---
 
-## 📦 Deployment
-
-### Backend: [Railway](https://railway.com)
-
-
-### Frontend: (Recommended) [Vercel](https://vercel.com) 
-
-Update `VITE_BACKEND_URL` in frontend `.env` accordingly after deployment.
-
----
 
 ## 📌 To-Do (Future Scope)
 
