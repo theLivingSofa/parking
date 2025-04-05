@@ -75,53 +75,106 @@ export const checkIn = async (req, res) => {
 };
 
 // Check-out a user and calculate fee
+// export const checkOut = async (req, res) => {
+//   try {
+//     const { qrcodeUrl } = req.body;
+
+//     if (!qrcodeUrl) {
+//       return res.status(400).json({ message: "QR code URL is required" });
+//     }
+
+//     const userData = await decodeQRCode(qrcodeUrl);
+//     const user = await userModel.findOne({ l_no: userData.l_no });
+
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+
+//     if (!user.checkIn) {
+//       return res.status(400).json({ message: "No check-in record found" });
+//     }
+
+//     const checkOutTime = new Date();
+//     const checkInTime = user.checkIn;
+//     const diffInMs = checkOutTime - checkInTime;
+//     const durationHours = diffInMs / (1000 * 60 * 60);
+//     const roundedHours = Math.ceil(durationHours); // Round up to nearest hour
+//     const rate = Math.max(20, Math.round(roundedHours * 20)); // ₹20/hour, minimum ₹20
+
+//     user.logs.push({
+//       checkIn: checkInTime,
+//       checkOut: checkOutTime,
+//       duration: roundedHours,
+//     });
+
+//     user.status = false;
+//     user.checkOut = checkOutTime;
+//     user.checkIn = null;
+
+//     await user.save();
+
+//     return res.status(200).json({
+//       message: "User has successfully checked out",
+//       rate: rate,
+//     });
+//   } catch (error) {
+//     console.log("Error during check-out", error.message);
+//     return res.status(500).json({ message: "Internal Server Error", error: error.message });
+//   }
+// };
+
 export const checkOut = async (req, res) => {
-  try {
-    const { qrcodeUrl } = req.body;
+    try {
+        const { qrcodeUrl } = req.body;
 
-    if (!qrcodeUrl) {
-      return res.status(400).json({ message: "QR code URL is required" });
+        if (!qrcodeUrl) {
+            return res.status(400).json({ message: "QR code URL is required" });
+        }
+
+        const userData = await decodeQRCode(qrcodeUrl);
+        const user = await userModel.findOne({ l_no: userData.l_no });
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        if (!user.checkIn) {
+            return res.status(400).json({ message: "No check-in record found" });
+        }
+
+        const checkOutTime = new Date();
+        const checkInTime = user.checkIn;
+        const durationMs = checkOutTime - checkInTime;
+        const durationHours = durationMs / (1000 * 60 * 60);
+        const roundedHours = Math.ceil(durationHours);
+        const amountCharged = Math.max(20, Math.round(roundedHours * 20));
+
+        // Push this session to logs with billing info
+        user.logs.push({
+            checkIn: checkInTime,
+            checkOut: checkOutTime,
+            duration: roundedHours,
+            amount: amountCharged,
+        });
+
+        // Update user status
+        user.status = false;
+        user.checkOut = checkOutTime;
+        user.checkIn = null;
+
+        await user.save();
+
+        return res.status(200).json({
+            message: "User has successfully checked out",
+            rate: amountCharged,
+        });
+
+    } catch (error) {
+        console.log("Error during check-out:", error.message);
+        return res.status(500).json({ message: "Internal Server Error", error: error.message });
     }
-
-    const userData = await decodeQRCode(qrcodeUrl);
-    const user = await userModel.findOne({ l_no: userData.l_no });
-
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    if (!user.checkIn) {
-      return res.status(400).json({ message: "No check-in record found" });
-    }
-
-    const checkOutTime = new Date();
-    const checkInTime = user.checkIn;
-    const diffInMs = checkOutTime - checkInTime;
-    const durationHours = diffInMs / (1000 * 60 * 60);
-    const roundedHours = Math.ceil(durationHours); // Round up to nearest hour
-    const rate = Math.max(20, Math.round(roundedHours * 20)); // ₹20/hour, minimum ₹20
-
-    user.logs.push({
-      checkIn: checkInTime,
-      checkOut: checkOutTime,
-      duration: roundedHours,
-    });
-
-    user.status = false;
-    user.checkOut = checkOutTime;
-    user.checkIn = null;
-
-    await user.save();
-
-    return res.status(200).json({
-      message: "User has successfully checked out",
-      rate: rate,
-    });
-  } catch (error) {
-    console.log("Error during check-out", error.message);
-    return res.status(500).json({ message: "Internal Server Error", error: error.message });
-  }
 };
+
 
 // Check current status of a user
 export const checkStatus = async (req, res) => {
