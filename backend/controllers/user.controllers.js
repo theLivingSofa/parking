@@ -1,165 +1,154 @@
-import { generateQrCode } from "../lib/generateQrcode.js"
-import { decodeQRCode } from "../lib/decodeQrcode.js"
-import userModel from "../models/user.model.js"
+import { generateQrCode } from "../lib/generateQrcode.js";
+import { decodeQRCode } from "../lib/decodeQrcode.js";
+import userModel from "../models/user.model.js";
 
+// Register a new user
 export const register = async (req, res) => {
-    try {
-        const { name, p_no, l_no } = req.body
-        if (!name) {
-            res.status(400).json({ message: "name is required" })
-        }
-        if (!p_no) {
-            res.status(400).json({ message: "p_no is required" })
-        }
-        if (!l_no) {
-            res.status(400).json({ message: "l_no is required" })
-        }
+  try {
+    const { name, p_no, l_no } = req.body;
 
-        const userExits = await userModel.findOne({l_no : l_no})
-
-        if(userExits){
-            return res.status(400).json({message : "License plate already exits"})
-        }
-
-        let url = await generateQrCode(name, p_no, l_no)
-
-        const user = await userModel.create({
-            name,
-            p_no,
-            l_no,
-            status: false,
-            qrcodeUrl: url,
-        })
-
-        return res.status(200).json({
-            user: {
-                name: user.name,
-                p_no: user.p_no,
-                l_no: user.l_no,
-                status: false,
-                qrcodeUrl: user.qrcodeUrl,
-            }, message: "user is created"
-        })
-
-    } catch (error) {
-        console.log("Error while creating user", error.message)
-        return res.status(500).json({ message: "Internal Server Error", error: error.message })
+    if (!name || !p_no || !l_no) {
+      return res.status(400).json({ message: "All fields are required" });
     }
-}
 
+    const userExists = await userModel.findOne({ l_no });
+
+    if (userExists) {
+      return res.status(400).json({ message: "License plate already exists" });
+    }
+
+    const url = await generateQrCode(name, p_no, l_no);
+
+    const user = await userModel.create({
+      name,
+      p_no,
+      l_no,
+      status: false,
+      qrcodeUrl: url,
+    });
+
+    return res.status(200).json({
+      user: {
+        name: user.name,
+        p_no: user.p_no,
+        l_no: user.l_no,
+        status: user.status,
+        qrcodeUrl: user.qrcodeUrl,
+      },
+      message: "User is created",
+    });
+  } catch (error) {
+    console.log("Error while creating user", error.message);
+    return res.status(500).json({ message: "Internal Server Error", error: error.message });
+  }
+};
+
+// Check-in a user
 export const checkIn = async (req, res) => {
-    try {
-        const { qrcodeUrl } = req.body;
+  try {
+    const { qrcodeUrl } = req.body;
 
-        if (!qrcodeUrl) {
-            return res.status(400).json({ message: "QR code URL is required" });
-        }
-
-        const userData = await decodeQRCode(qrcodeUrl);
-        const user = await userModel.findOne({ l_no: userData.l_no });
-
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-
-        if (user.status === true && user.checkIn) {
-            return res.status(400).json({ message: "User is already checked in" });
-        }
-
-        user.status = true;
-        user.checkIn = new Date();
-
-        await user.save();
-
-        return res.status(200).json({ message: "User has successfully checked in" });
-
-    } catch (error) {
-        console.error("Error during check-in:", error.message);
-        return res.status(500).json({ message: "Internal Server Error", error: error.message });
+    if (!qrcodeUrl) {
+      return res.status(400).json({ message: "QR code URL is required" });
     }
+
+    const userData = await decodeQRCode(qrcodeUrl);
+    const user = await userModel.findOne({ l_no: userData.l_no });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.status && user.checkIn) {
+      return res.status(400).json({ message: "User is already checked in" });
+    }
+
+    user.status = true;
+    user.checkIn = new Date();
+    await user.save();
+
+    return res.status(200).json({ message: "User has successfully checked in" });
+  } catch (error) {
+    console.error("Error during check-in:", error.message);
+    return res.status(500).json({ message: "Internal Server Error", error: error.message });
+  }
 };
 
-
-
+// Check-out a user and calculate fee
 export const checkOut = async (req, res) => {
-    try {
-        const { qrcodeUrl } = req.body;
+  try {
+    const { qrcodeUrl } = req.body;
 
-        if (!qrcodeUrl) {
-            return res.status(400).json({ message: "url is required" });
-        }
-
-        const userData = await decodeQRCode(qrcodeUrl);
-        const user = await userModel.findOne({ l_no: userData.l_no });
-
-        if (!user) {
-            return res.status(400).json({ message: "user is not found" });
-        }
-
-        if (!user.checkIn) {
-            return res.status(400).json({ message: "No check-in record found" });
-        }
-
-        const checkOutTime = new Date();
-        const checkInTime = user.checkIn;
-        const diffInMs = checkOutTime - checkInTime;
-        const hrs = diffInMs / (1000 * 60 * 60);
-        const rate = 20 * hrs;
-
-        // Push this session to logs
-        user.logs.push({
-            checkIn: checkInTime,
-            checkOut: checkOutTime,
-            duration: hrs,
-        });
-
-        // Update user status
-        user.status = false;
-        user.checkOut = checkOutTime;
-        user.checkIn = null; // Clear the checkIn timestamp for future reuse
-
-        await user.save();
-
-        return res.status(200).json({
-            message: "User is check-out",
-            rate: rate,
-        });
-
-    } catch (error) {
-        console.log("error while check-out", error.message);
-        return res.status(500).json({ message: "Internal Server Error", error: error.message });
+    if (!qrcodeUrl) {
+      return res.status(400).json({ message: "QR code URL is required" });
     }
+
+    const userData = await decodeQRCode(qrcodeUrl);
+    const user = await userModel.findOne({ l_no: userData.l_no });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (!user.checkIn) {
+      return res.status(400).json({ message: "No check-in record found" });
+    }
+
+    const checkOutTime = new Date();
+    const checkInTime = user.checkIn;
+    const diffInMs = checkOutTime - checkInTime;
+    const durationHours = diffInMs / (1000 * 60 * 60);
+    const roundedHours = Math.ceil(durationHours); // Round up to nearest hour
+    const rate = Math.max(20, Math.round(roundedHours * 20)); // ₹20/hour, minimum ₹20
+
+    user.logs.push({
+      checkIn: checkInTime,
+      checkOut: checkOutTime,
+      duration: roundedHours,
+    });
+
+    user.status = false;
+    user.checkOut = checkOutTime;
+    user.checkIn = null;
+
+    await user.save();
+
+    return res.status(200).json({
+      message: "User has successfully checked out",
+      rate: rate,
+    });
+  } catch (error) {
+    console.log("Error during check-out", error.message);
+    return res.status(500).json({ message: "Internal Server Error", error: error.message });
+  }
 };
 
-
-
+// Check current status of a user
 export const checkStatus = async (req, res) => {
-    try {
-        const { qrcodeUrl } = req.body;
+  try {
+    const { qrcodeUrl } = req.body;
 
-        if (!qrcodeUrl) {
-            return res.status(400).json({ message: "url is required" });
-        }
-
-        const userData = await decodeQRCode(qrcodeUrl);
-        const user = await userModel.findOne({ l_no: userData.l_no });
-
-        if (!user) {
-            return res.status(400).json({ message: "user is not found" });
-        }
-
-        return res.status(200).json({
-            name: user.name,
-            license_plate: user.l_no,
-            phone: user.p_no,
-            isParked: user.status,
-            currentCheckIn: user.checkIn || null,
-            logs: user.logs || []
-        });
-
-    } catch (error) {
-        console.log("error while checking status", error.message);
-        return res.status(500).json({ message: "Internal Server Error", error: error.message });
+    if (!qrcodeUrl) {
+      return res.status(400).json({ message: "QR code URL is required" });
     }
-};
 
+    const userData = await decodeQRCode(qrcodeUrl);
+    const user = await userModel.findOne({ l_no: userData.l_no });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({
+      name: user.name,
+      license_plate: user.l_no,
+      phone: user.p_no,
+      isParked: user.status,
+      currentCheckIn: user.checkIn || null,
+      logs: user.logs || [],
+    });
+  } catch (error) {
+    console.log("Error while checking status", error.message);
+    return res.status(500).json({ message: "Internal Server Error", error: error.message });
+  }
+};
