@@ -132,8 +132,11 @@ function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center">
-              <QrScanner className="h-8 w-8 text-indigo-600" />
-              <span className="ml-2 text-xl font-bold text-gray-900">Parking System</span>
+              {/*<QrScanner className="h-8 w-8 text-indigo-600" />*/}
+              <a href="https://parking-mit.vercel.app/dashboard" className="inline-block" // Optional: Add classes for layout if needed for the link itself
+                ><QrScanner className="h-8 w-8 text-indigo-600 hover:text-indigo-800 transition-colors" /></a> 
+              {/*<span className="ml-2 text-xl font-bold text-gray-900">Parking System</span>*/}
+              <a href="https://parking-mit.vercel.app/dashboard" className="ml-2 text-xl font-bold text-gray-900 hover:text-indigo-600 transition-colors" >Parking System </a>
             </div>
             <button
               onClick={() => signOut(auth)}
