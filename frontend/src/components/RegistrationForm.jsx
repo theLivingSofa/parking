@@ -15,7 +15,9 @@ function RegistrationForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/register`, formData);
+      // const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/register`, formData);
+      const response = await axios.post("https://parking-production-735c.up.railway.app/api/register", formData);
+
       console.log("response",response)
       setQrCode(response.data.user.qrcodeUrl);
       setError('');
