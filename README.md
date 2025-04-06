@@ -39,6 +39,7 @@ A modern and efficient **Web-Based Parking Management System** that allows vehic
 - React ≥ 18.x
 - MongoDB Atlas account
 - A browser with webcam access for scanning QR codes
+- A thermal printer wich can print the qr codes (Optional)
 
 ---
 
