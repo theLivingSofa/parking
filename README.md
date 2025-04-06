@@ -44,6 +44,7 @@ A modern and efficient **Web-Based Parking Management System** that allows vehic
 
 ## ✨ Functionality
 
+
 ### ✅ Vehicle Registration
 - Enter user details (name, phone, license number)
 - Generates a unique QR code containing relevant data
