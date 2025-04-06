@@ -72,25 +72,6 @@ A modern and efficient **Web-Based Parking Management System** that allows vehic
 
 ---
 
-## 🧼 Reset All Logs (Admin/Dev)
-
-To clear all logs and reset check-in/check-out:
-
-```js
-db.users.updateMany({}, {
-  $set: {
-    logs: [],
-    checkIn: null,
-    checkOut: null,
-    status: false
-  }
-});
-```
-
-Use this from **MongoDB Atlas > Browse Collections > MONGOSH**.
-
----
-
 
 ## 📌 To-Do (Future Scope)
 
