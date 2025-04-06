@@ -1,6 +1,6 @@
 # 🚗 QR Code Based Parking Management System
 
-A modern and efficient **Web-Based Parking Management System** that allows vehicle check-ins and check-outs using **QR codes**. Built using **JavaScript** for the backend, **MongoDB Atlas** for the database, and **React** for the frontend interface.
+A modern and efficient **Web-Based Parking Management System** that allows vehicle check-ins and check-outs using **QR codes**. Built using **Node,jS + Express** for the backend, **MongoDB Atlas** for the database, and **React** for the frontend interface.
 
 ---
 
