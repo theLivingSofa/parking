@@ -11,6 +11,11 @@ export const register = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
+    const licenseRegex = /^[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}$/;
+    if (!licenseRegex.test(l_no)) {
+      return res.status(400).json({ message: "License plate must be in format AB12AB1234" });
+    }
+
     const userExists = await userModel.findOne({ l_no });
 
     if (userExists) {

@@ -330,6 +330,13 @@ function RegistrationForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const licenseRegex = /^[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}$/;
+  if (!licenseRegex.test(formData.l_no)) {
+    setError("License plate must be in format AB12AB1234");
+    return;
+  }
+
     try {
       const response = await axios.post("https://parking-production-735c.up.railway.app/api/register", formData);
       setQrCode(response.data.user.qrcodeUrl);
