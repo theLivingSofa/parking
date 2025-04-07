@@ -642,7 +642,11 @@ function StatusCheck() {
     setFilteredLogs([]);
     try {
       const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/status`, payload);
-      setStatus(response.data);
+      const data = response.data;
+      if (data.logs && Array.isArray(data.logs)) {
+        data.logs.sort((a, b) => new Date(b.checkIn) - new Date(a.checkIn)); // Latest first
+      }
+      setStatus(data);
     } catch (err) {
       console.error(err);
       setStatus(null);
@@ -652,27 +656,41 @@ function StatusCheck() {
     }
   };
 
-  const fetchLogsByDate = async () => {
-    if (!status?.license_plate) return;
-    const payload = { l_no: status.license_plate };
+  const fetchLogsByDate = () => {
+    if (!status?.logs || !fromDate || !toDate) return;
 
-    if (fromDate && toDate) {
-      payload.from = fromDate.toISOString();
-      payload.to = toDate.toISOString();
-    }
+    const filtered = status.logs.filter((log) => {
+      const checkInDate = new Date(log.checkIn);
+      return checkInDate >= fromDate && checkInDate <= toDate;
+    });
 
-    setLoading(true);
-    setError('');
-    try {
-      const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/status`, payload);
-      setFilteredLogs(response.data.logs || []);
-    } catch (err) {
-      console.error(err);
-      setError('Could not fetch logs.');
-      setFilteredLogs([]);
-    } finally {
-      setLoading(false);
-    }
+    setFilteredLogs(filtered);
+  };
+
+  const exportCSV = () => {
+    if (!filteredLogs.length) return;
+
+    const csvContent = [
+      ['CheckIn', 'CheckOut', 'Duration (hrs)', 'Amount'],
+      ...filteredLogs.map((log) => [
+        new Date(log.checkIn).toLocaleString(),
+        log.checkOut ? new Date(log.checkOut).toLocaleString() : 'N/A',
+        log.duration?.toFixed(2) ?? '0',
+        log.amount ?? '0',
+      ]),
+    ]
+      .map((row) => row.join(','))
+      .join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'parking_logs.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handleError = (error) => {
@@ -680,7 +698,7 @@ function StatusCheck() {
   };
 
   return (
-    <div className="max-w-md mx-auto space-y-6 px-4">
+    <div className="max-w-md mx-auto space-y-6">
       {/* Manual Input */}
       <div className="flex gap-2">
         <input
@@ -726,13 +744,13 @@ function StatusCheck() {
         </div>
       )}
 
-      {/* Status Details */}
+      {/* Status Display */}
       {loading && <div className="text-center text-sm text-blue-600">Loading...</div>}
-
       {error && <div className="text-red-600 text-sm p-3 bg-red-50 rounded-md">{error}</div>}
 
       {status && (
         <div className="mt-4 p-4 bg-gray-50 rounded-md space-y-4">
+          {/* User Info */}
           <div>
             <h3 className="text-lg font-medium text-gray-900">User Status</h3>
             <dl className="mt-2 space-y-2">
@@ -776,10 +794,8 @@ function StatusCheck() {
               <ul className="list-disc pl-5 mt-2 space-y-1 text-sm text-gray-800">
                 <li>
                   In: {new Date(status.logs[0].checkIn).toLocaleString()} → Out:{' '}
-                  {status.logs[0].checkOut
-                    ? new Date(status.logs[0].checkOut).toLocaleString()
-                    : 'N/A'}{' '}
-                  — {status.logs[0].duration?.toFixed(2) ?? '0'} hrs
+                  {status.logs[0].checkOut ? new Date(status.logs[0].checkOut).toLocaleString() : 'N/A'} —{' '}
+                  {status.logs[0].duration?.toFixed(2) ?? '0'} hrs
                   {status.logs[0].amount ? ` — ₹${status.logs[0].amount}` : ''}
                 </li>
               </ul>
@@ -789,8 +805,8 @@ function StatusCheck() {
           {/* Date Range Picker */}
           <div className="space-y-2">
             <h4 className="text-md font-semibold text-gray-700">Search Logs by Date</h4>
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:gap-3">
-              <div className="flex flex-col text-sm flex-1">
+            <div className="flex flex-wrap gap-3 items-end">
+              <div className="flex flex-col text-sm">
                 <label className="mb-1 text-gray-600">From:</label>
                 <DatePicker
                   selected={fromDate}
@@ -804,7 +820,7 @@ function StatusCheck() {
                 />
               </div>
 
-              <div className="flex flex-col text-sm flex-1">
+              <div className="flex flex-col text-sm">
                 <label className="mb-1 text-gray-600">To:</label>
                 <DatePicker
                   selected={toDate}
@@ -820,10 +836,18 @@ function StatusCheck() {
 
               <button
                 onClick={fetchLogsByDate}
-                className="sm:self-end px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700"
+                className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700"
               >
                 Search
               </button>
+              {filteredLogs.length > 0 && (
+                <button
+                  onClick={exportCSV}
+                  className="px-4 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700"
+                >
+                  Export CSV
+                </button>
+              )}
             </div>
           </div>
 
@@ -856,4 +880,3 @@ function StatusCheck() {
 }
 
 export default StatusCheck;
-
