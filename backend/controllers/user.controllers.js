@@ -248,24 +248,25 @@ export const checkStatus = async (req, res) => {
 
     let logs = user.logs || [];
 
-    // Step 2: Filter logs between date range (if provided)
+    // Step 2: Sort logs by newest first
+    logs.sort((a, b) => new Date(b.checkIn).getTime() - new Date(a.checkIn).getTime());
+
+    // Step 3: Apply date range filter (if provided)
     if (startDate && endDate) {
       const start = new Date(startDate);
       const end = new Date(endDate);
-      end.setHours(23, 59, 59, 999); // include full end day
+      end.setHours(23, 59, 59, 999); // Include entire end date
 
       logs = logs.filter(log => {
-        const checkInTime = new Date(log.checkIn);
-        return checkInTime >= start && checkInTime <= end;
+        const checkIn = new Date(log.checkIn).getTime();
+        return checkIn >= start.getTime() && checkIn <= end.getTime();
       });
-    } 
-    // Step 3: If no dates sent, return only the latest log
-    else if (logs.length > 0) {
-      logs.sort((a, b) => new Date(b.checkIn) - new Date(a.checkIn));
-      logs = [logs[0]];
+    } else {
+      // Step 4: If no range, show only the latest log
+      logs = logs.length > 0 ? [logs[0]] : [];
     }
 
-    // Step 4: Return response
+    // Step 5: Send response
     return res.status(200).json({
       name: user.name,
       license_plate: user.l_no,
@@ -281,7 +282,8 @@ export const checkStatus = async (req, res) => {
     });
 
   } catch (error) {
-    console.log("Error while checking status:", error.message);
+    console.error("Error while checking status:", error.message);
     return res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 };
+

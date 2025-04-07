@@ -680,7 +680,7 @@ function StatusCheck() {
   };
 
   return (
-    <div className="max-w-md mx-auto space-y-6">
+    <div className="max-w-md mx-auto space-y-6 px-4">
       {/* Manual Input */}
       <div className="flex gap-2">
         <input
@@ -769,19 +769,19 @@ function StatusCheck() {
             </dl>
           </div>
 
-          {/* Visit History */}
+          {/* Latest Log */}
           {filteredLogs.length === 0 && status.logs?.length > 0 && (
             <div>
               <h4 className="text-md font-semibold text-gray-700">Latest Log</h4>
               <ul className="list-disc pl-5 mt-2 space-y-1 text-sm text-gray-800">
-                {status.logs.map((log, idx) => (
-                  <li key={idx}>
-                    In: {new Date(log.checkIn).toLocaleString()} → Out:{' '}
-                    {log.checkOut ? new Date(log.checkOut).toLocaleString() : 'N/A'} —{' '}
-                    {log.duration?.toFixed(2) ?? '0'} hrs
-                    {log.amount ? ` — ₹${log.amount}` : ''}
-                  </li>
-                ))}
+                <li>
+                  In: {new Date(status.logs[0].checkIn).toLocaleString()} → Out:{' '}
+                  {status.logs[0].checkOut
+                    ? new Date(status.logs[0].checkOut).toLocaleString()
+                    : 'N/A'}{' '}
+                  — {status.logs[0].duration?.toFixed(2) ?? '0'} hrs
+                  {status.logs[0].amount ? ` — ₹${status.logs[0].amount}` : ''}
+                </li>
               </ul>
             </div>
           )}
@@ -789,8 +789,8 @@ function StatusCheck() {
           {/* Date Range Picker */}
           <div className="space-y-2">
             <h4 className="text-md font-semibold text-gray-700">Search Logs by Date</h4>
-            <div className="flex items-end gap-3">
-              <div className="flex flex-col text-sm">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:gap-3">
+              <div className="flex flex-col text-sm flex-1">
                 <label className="mb-1 text-gray-600">From:</label>
                 <DatePicker
                   selected={fromDate}
@@ -804,7 +804,7 @@ function StatusCheck() {
                 />
               </div>
 
-              <div className="flex flex-col text-sm">
+              <div className="flex flex-col text-sm flex-1">
                 <label className="mb-1 text-gray-600">To:</label>
                 <DatePicker
                   selected={toDate}
@@ -820,7 +820,7 @@ function StatusCheck() {
 
               <button
                 onClick={fetchLogsByDate}
-                className="px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700"
+                className="sm:self-end px-4 py-2 bg-indigo-600 text-white text-sm rounded-md hover:bg-indigo-700"
               >
                 Search
               </button>
@@ -856,3 +856,4 @@ function StatusCheck() {
 }
 
 export default StatusCheck;
+
