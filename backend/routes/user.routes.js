@@ -8,7 +8,6 @@ router.post("/checkin",checkIn)
 router.post("/checkout",checkOut)
 router.post("/status",checkStatus)
 
-
 export default router
 
 // import express from "express";
@@ -23,5 +22,7 @@ export default router
 // router.post("/checkin", verifyToken, checkIn);
 // router.post("/checkout", verifyToken, checkOut);
 // router.post("/status", verifyToken, checkStatus);
+// router.post("/logs", verifyToken, getLogsByDate);
+
 
 // export default router;
