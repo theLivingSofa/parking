@@ -713,7 +713,7 @@ function StatusCheck() {
     if (!logs.length || !status) return;
   
     const csvContent = [
-      ['License Plate', 'Name', 'Phone Number', 'Check-In Time', 'Check-Out Time', 'Duration (hrs)', 'Amount (₹)'],
+      ['License Plate', 'Name', 'Phone Number','Check-In Date', 'Check-In Time','Check-Out Date', 'Check-Out Time', 'Duration (hrs)', 'Amount (₹)'],
       ...logs.map((log) => [
         status.license_plate,
         status.name,
