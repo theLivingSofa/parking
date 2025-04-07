@@ -656,16 +656,31 @@ function StatusCheck() {
     }
   };
 
+  // const fetchLogsByDate = () => {
+  //   if (!status?.logs || !fromDate || !toDate) return;
+
+  //   const filtered = status.logs.filter((log) => {
+  //     const checkInDate = new Date(log.checkIn);
+  //     return checkInDate >= fromDate && checkInDate <= toDate;
+  //   });
+
+  //   setFilteredLogs(filtered);
+  // };
+
   const fetchLogsByDate = () => {
     if (!status?.logs || !fromDate || !toDate) return;
-
+  
+    const endOfDay = new Date(toDate);
+    endOfDay.setHours(23, 59, 59, 999);
+  
     const filtered = status.logs.filter((log) => {
       const checkInDate = new Date(log.checkIn);
-      return checkInDate >= fromDate && checkInDate <= toDate;
+      return checkInDate >= fromDate && checkInDate <= endOfDay;
     });
-
+  
     setFilteredLogs(filtered);
   };
+  
 
   const exportCSV = () => {
     if (!filteredLogs.length) return;
