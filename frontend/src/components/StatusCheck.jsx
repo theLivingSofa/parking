@@ -682,31 +682,80 @@ function StatusCheck() {
   };
   
 
-  const exportCSV = () => {
-    if (!filteredLogs.length) return;
+  // const exportCSV = () => {
+  //   if (!filteredLogs.length) return;
 
+  //   const csvContent = [
+  //     ['CheckIn','CheckInTime', 'CheckOut','CheckOutTime', 'Duration (hrs)', 'Amount'],
+  //     ...filteredLogs.map((log) => [
+  //       new Date(log.checkIn).toLocaleString(),
+  //       log.checkOut ? new Date(log.checkOut).toLocaleString() : 'N/A',
+  //       log.duration?.toFixed(2) ?? '0',
+  //       log.amount ?? '0',
+  //     ]),
+  //   ]
+  //     .map((row) => row.join(','))
+  //     .join('\n');
+
+  //   const blob = new Blob([csvContent], { type: 'text/csv' });
+  //   const url = URL.createObjectURL(blob);
+
+  //   const link = document.createElement('a');
+  //   link.href = url;
+  //   link.download = 'parking_logs.csv';
+  //   document.body.appendChild(link);
+  //   link.click();
+  //   document.body.removeChild(link);
+  // };
+
+  const exportCSV = () => {
+    const logs = filteredLogs.length > 0 ? filteredLogs : status?.logs || [];
+    if (!logs.length || !status) return;
+  
     const csvContent = [
-      ['CheckIn', 'CheckOut', 'Duration (hrs)', 'Amount'],
-      ...filteredLogs.map((log) => [
-        new Date(log.checkIn).toLocaleString(),
-        log.checkOut ? new Date(log.checkOut).toLocaleString() : 'N/A',
+      ['License Plate', 'Name', 'Phone Number', 'Check-In Time', 'Check-Out Time', 'Duration (hrs)', 'Amount (₹)'],
+      ...logs.map((log) => [
+        status.license_plate,
+        status.name,
+        status.phone,
+        new Date(log.checkIn).toLocaleString('en-IN', {
+          hour12: false,
+          day: '2-digit',
+          month: '2-digit',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        }),
+        log.checkOut
+          ? new Date(log.checkOut).toLocaleString('en-IN', {
+              hour12: false,
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+            })
+          : 'N/A',
         log.duration?.toFixed(2) ?? '0',
         log.amount ?? '0',
       ]),
     ]
       .map((row) => row.join(','))
       .join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv' });
+  
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
-
+  
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'parking_logs.csv';
+    link.download = `${status.license_plate}_parking_logs.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
+  
 
   const handleError = (error) => {
     setError('Camera access error: ' + error.message);
