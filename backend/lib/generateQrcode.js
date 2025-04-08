@@ -7,36 +7,13 @@
 //     return qrCodeDataURL;                                // Return image as base64 string
 // }
 
+
 import QRCode from 'qrcode';
-import { v4 as uuidv4 } from 'uuid';
-import userModel from '../models/user.model.js';
 
-export const generateQrCode = async (userId) => {
-  try {
-    // Generate a unique UUID token
-    const token = uuidv4();
-
-    // Update user with the generated QR token
-    const user = await userModel.findByIdAndUpdate(
-      userId,
-      { qrToken: token },
-      { new: true }
-    );
-
-    if (!user) {
-      throw new Error("User not found");
-    }
-
-    // Generate QR code with the token as JSON data
-    const qrData = JSON.stringify({ token });
-    const qrCodeUrl = await QRCode.toDataURL(qrData);
-    return qrCodeUrl;
-  } catch (error) {
-    console.error("Error generating QR code:", error.message);
-    throw error;
-  }
+export const generateQrCode = async (name, p_no, l_no) => {
+  const data = JSON.stringify({ name, p_no, l_no }); // Convert object to a string
+  return await QRCode.toDataURL(data); // Generate a Base64 QR code
 };
-
 
 
 
