@@ -435,7 +435,7 @@ function RegistrationForm() {
                   value={formData.name}
                   onChange={handleChange}
                   className="pl-10 p-2 w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 uppercase"
-                  placeholder="Eg. JOHN DOE"
+                  placeholder="Eg. Ayush Agrawal"
                 />
               </div>
             </div>
