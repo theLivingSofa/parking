@@ -8,12 +8,6 @@
 // }
 
 
-import QRCode from 'qrcode';
-
-export const generateQrCode = async (name, p_no, l_no) => {
-  const data = JSON.stringify({ name, p_no, l_no }); // Convert object to a string
-  return await QRCode.toDataURL(data); // Generate a Base64 QR code
-};
 
 
 

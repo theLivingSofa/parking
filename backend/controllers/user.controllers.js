@@ -1,8 +1,237 @@
+// import { generateQrCode } from "../lib/generateQrcode.js";
+// import { decodeQRCode } from "../lib/decodeQrcode.js";
+// import userModel from "../models/user.model.js";
+
+// // Register a new user
+// export const register = async (req, res) => {
+//   try {
+//     const { name, p_no, l_no } = req.body;
+
+//     if (!name || !p_no || !l_no) {
+//       return res.status(400).json({ message: "All fields are required" });
+//     }
+
+//     const licenseRegex = /^[A-Z]{2}[0-9]{2}[A-Z]{2}[0-9]{4}$/;
+//     if (!licenseRegex.test(l_no)) {
+//       return res.status(400).json({ message: "License plate must be in format AB12AB1234" });
+//     }
+
+//     const userExists = await userModel.findOne({ l_no });
+
+//     if (userExists) {
+//       return res.status(400).json({ message: "License plate already exists" });
+//     }
+
+//     const url = await generateQrCode(name, p_no, l_no);
+
+//     const user = await userModel.create({
+//       name,
+//       p_no,
+//       l_no,
+//       status: false,
+//       qrcodeUrl: url,
+//     });
+
+//     return res.status(200).json({
+//       user: {
+//         name: user.name,
+//         p_no: user.p_no,
+//         l_no: user.l_no,
+//         status: user.status,
+//         qrcodeUrl: user.qrcodeUrl,
+//       },
+//       message: "User is created",
+//     });
+//   } catch (error) {
+//     console.log("Error while creating user", error.message);
+//     return res.status(500).json({ message: "Internal Server Error", error: error.message });
+//   }
+// };
+
+// // Check-in a user
+// export const checkIn = async (req, res) => {
+//   try {
+//     const { qrcodeUrl } = req.body;
+
+//     if (!qrcodeUrl) {
+//       return res.status(400).json({ message: "QR code URL is required" });
+//     }
+
+//     const userData = await decodeQRCode(qrcodeUrl);
+//     const user = await userModel.findOne({ l_no: userData.l_no });
+
+//     if (!user) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+
+//     if (user.status && user.checkIn) {
+//       return res.status(400).json({ message: "User is already checked in" });
+//     }
+
+//     user.status = true;
+//     user.checkIn = new Date();
+//     await user.save();
+
+//     return res.status(200).json({ message: "User has successfully checked in" });
+//   } catch (error) {
+//     console.error("Error during check-in:", error.message);
+//     return res.status(500).json({ message: "Internal Server Error", error: error.message });
+//   }
+// };
+
+// // Check-out a user and calculate fee
+// // export const checkOut = async (req, res) => {
+// //   try {
+// //     const { qrcodeUrl } = req.body;
+
+// //     if (!qrcodeUrl) {
+// //       return res.status(400).json({ message: "QR code URL is required" });
+// //     }
+
+// //     const userData = await decodeQRCode(qrcodeUrl);
+// //     const user = await userModel.findOne({ l_no: userData.l_no });
+
+// //     if (!user) {
+// //       return res.status(404).json({ message: "User not found" });
+// //     }
+
+// //     if (!user.checkIn) {
+// //       return res.status(400).json({ message: "No check-in record found" });
+// //     }
+
+// //     const checkOutTime = new Date();
+// //     const checkInTime = user.checkIn;
+// //     const diffInMs = checkOutTime - checkInTime;
+// //     const durationHours = diffInMs / (1000 * 60 * 60);
+// //     const roundedHours = Math.ceil(durationHours); // Round up to nearest hour
+// //     const rate = Math.max(20, Math.round(roundedHours * 20)); // ₹20/hour, minimum ₹20
+
+// //     user.logs.push({
+// //       checkIn: checkInTime,
+// //       checkOut: checkOutTime,
+// //       duration: roundedHours,
+// //     });
+
+// //     user.status = false;
+// //     user.checkOut = checkOutTime;
+// //     user.checkIn = null;
+
+// //     await user.save();
+
+// //     return res.status(200).json({
+// //       message: "User has successfully checked out",
+// //       rate: rate,
+// //     });
+// //   } catch (error) {
+// //     console.log("Error during check-out", error.message);
+// //     return res.status(500).json({ message: "Internal Server Error", error: error.message });
+// //   }
+// // };
+
+// export const checkOut = async (req, res) => {
+//     try {
+//         const { qrcodeUrl } = req.body;
+
+//         if (!qrcodeUrl) {
+//             return res.status(400).json({ message: "QR code URL is required" });
+//         }
+
+//         const userData = await decodeQRCode(qrcodeUrl);
+//         const user = await userModel.findOne({ l_no: userData.l_no });
+
+//         if (!user) {
+//             return res.status(404).json({ message: "User not found" });
+//         }
+
+//         if (!user.checkIn) {
+//             return res.status(400).json({ message: "No check-in record found" });
+//         }
+
+//         const checkOutTime = new Date();
+//         const checkInTime = user.checkIn;
+//         const durationMs = checkOutTime - checkInTime;
+//         const durationHours = durationMs / (1000 * 60 * 60);
+//         const roundedHours = Math.ceil(durationHours);
+//         const amountCharged = Math.max(20, Math.round(roundedHours * 20));
+
+//         // Push this session to logs with billing info
+//         user.logs.push({
+//             checkIn: checkInTime,
+//             checkOut: checkOutTime,
+//             duration: roundedHours,
+//             amount: amountCharged,
+//         });
+
+//         // Update user status
+//         user.status = false;
+//         user.checkOut = checkOutTime;
+//         user.checkIn = null;
+
+//         await user.save();
+
+//         return res.status(200).json({
+//             message: "User has successfully checked out",
+//             rate: amountCharged,
+//         });
+
+//     } catch (error) {
+//         console.log("Error during check-out:", error.message);
+//         return res.status(500).json({ message: "Internal Server Error", error: error.message });
+//     }
+// };
+
+
+// //Check current status of a user
+// //Check current status of a user
+// export const checkStatus = async (req, res) => {
+//     try {
+//       const { qrcodeUrl, l_no } = req.body;
+  
+//       let user;
+  
+//       // Prioritize QR Code if provided
+//       if (qrcodeUrl) {
+//         const userData = await decodeQRCode(qrcodeUrl);
+//         user = await userModel.findOne({ l_no: userData.l_no });
+//       } 
+//       // Fallback to manual license number
+//       else if (l_no) {
+//         user = await userModel.findOne({ l_no });
+//       } 
+//       // Neither provided
+//       else {
+//         return res.status(400).json({ message: "Either QR code or License number is required" });
+//       }
+  
+//       if (!user) {
+//         return res.status(404).json({ message: "User not found" });
+//       }
+  
+//       return res.status(200).json({
+//         name: user.name,
+//         license_plate: user.l_no,
+//         phone: user.p_no,
+//         isParked: user.status,
+//         currentCheckIn: user.checkIn || null,
+//         logs: user.logs.map(log => ({
+//           checkIn: log.checkIn,
+//           checkOut: log.checkOut,
+//           duration: log.duration,
+//           amount: log.amount, 
+//         })) || [],
+//       });
+      
+//     } catch (error) {
+//       console.log("Error while checking status", error.message);
+//       return res.status(500).json({ message: "Internal Server Error", error: error.message });
+//     }
+//   };
+  
 import { generateQrCode } from "../lib/generateQrcode.js";
 import { decodeQRCode } from "../lib/decodeQrcode.js";
 import userModel from "../models/user.model.js";
 
-// Register a new user
+// Register a new user and generate QR code
 export const register = async (req, res) => {
   try {
     const { name, p_no, l_no } = req.body;
@@ -17,33 +246,34 @@ export const register = async (req, res) => {
     }
 
     const userExists = await userModel.findOne({ l_no });
-
     if (userExists) {
       return res.status(400).json({ message: "License plate already exists" });
     }
 
-    const url = await generateQrCode(name, p_no, l_no);
-
-    const user = await userModel.create({
+    const newUser = await userModel.create({
       name,
       p_no,
       l_no,
       status: false,
-      qrcodeUrl: url,
     });
+
+    const qrCode = await generateQrCode(newUser._id); // Generates UUID token and saves it
+
+    newUser.qrcodeUrl = qrCode;
+    await newUser.save();
 
     return res.status(200).json({
       user: {
-        name: user.name,
-        p_no: user.p_no,
-        l_no: user.l_no,
-        status: user.status,
-        qrcodeUrl: user.qrcodeUrl,
+        name: newUser.name,
+        p_no: newUser.p_no,
+        l_no: newUser.l_no,
+        status: newUser.status,
+        qrcodeUrl: newUser.qrcodeUrl,
       },
       message: "User is created",
     });
   } catch (error) {
-    console.log("Error while creating user", error.message);
+    console.error("Error while creating user:", error.message);
     return res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 };
@@ -57,8 +287,8 @@ export const checkIn = async (req, res) => {
       return res.status(400).json({ message: "QR code URL is required" });
     }
 
-    const userData = await decodeQRCode(qrcodeUrl);
-    const user = await userModel.findOne({ l_no: userData.l_no });
+    const { token } = await decodeQRCode(qrcodeUrl);
+    const user = await userModel.findOne({ qrToken: token });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -79,151 +309,90 @@ export const checkIn = async (req, res) => {
   }
 };
 
-// Check-out a user and calculate fee
-// export const checkOut = async (req, res) => {
-//   try {
-//     const { qrcodeUrl } = req.body;
-
-//     if (!qrcodeUrl) {
-//       return res.status(400).json({ message: "QR code URL is required" });
-//     }
-
-//     const userData = await decodeQRCode(qrcodeUrl);
-//     const user = await userModel.findOne({ l_no: userData.l_no });
-
-//     if (!user) {
-//       return res.status(404).json({ message: "User not found" });
-//     }
-
-//     if (!user.checkIn) {
-//       return res.status(400).json({ message: "No check-in record found" });
-//     }
-
-//     const checkOutTime = new Date();
-//     const checkInTime = user.checkIn;
-//     const diffInMs = checkOutTime - checkInTime;
-//     const durationHours = diffInMs / (1000 * 60 * 60);
-//     const roundedHours = Math.ceil(durationHours); // Round up to nearest hour
-//     const rate = Math.max(20, Math.round(roundedHours * 20)); // ₹20/hour, minimum ₹20
-
-//     user.logs.push({
-//       checkIn: checkInTime,
-//       checkOut: checkOutTime,
-//       duration: roundedHours,
-//     });
-
-//     user.status = false;
-//     user.checkOut = checkOutTime;
-//     user.checkIn = null;
-
-//     await user.save();
-
-//     return res.status(200).json({
-//       message: "User has successfully checked out",
-//       rate: rate,
-//     });
-//   } catch (error) {
-//     console.log("Error during check-out", error.message);
-//     return res.status(500).json({ message: "Internal Server Error", error: error.message });
-//   }
-// };
-
+// Check-out a user
 export const checkOut = async (req, res) => {
-    try {
-        const { qrcodeUrl } = req.body;
+  try {
+    const { qrcodeUrl } = req.body;
 
-        if (!qrcodeUrl) {
-            return res.status(400).json({ message: "QR code URL is required" });
-        }
-
-        const userData = await decodeQRCode(qrcodeUrl);
-        const user = await userModel.findOne({ l_no: userData.l_no });
-
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-
-        if (!user.checkIn) {
-            return res.status(400).json({ message: "No check-in record found" });
-        }
-
-        const checkOutTime = new Date();
-        const checkInTime = user.checkIn;
-        const durationMs = checkOutTime - checkInTime;
-        const durationHours = durationMs / (1000 * 60 * 60);
-        const roundedHours = Math.ceil(durationHours);
-        const amountCharged = Math.max(20, Math.round(roundedHours * 20));
-
-        // Push this session to logs with billing info
-        user.logs.push({
-            checkIn: checkInTime,
-            checkOut: checkOutTime,
-            duration: roundedHours,
-            amount: amountCharged,
-        });
-
-        // Update user status
-        user.status = false;
-        user.checkOut = checkOutTime;
-        user.checkIn = null;
-
-        await user.save();
-
-        return res.status(200).json({
-            message: "User has successfully checked out",
-            rate: amountCharged,
-        });
-
-    } catch (error) {
-        console.log("Error during check-out:", error.message);
-        return res.status(500).json({ message: "Internal Server Error", error: error.message });
+    if (!qrcodeUrl) {
+      return res.status(400).json({ message: "QR code URL is required" });
     }
+
+    const { token } = await decodeQRCode(qrcodeUrl);
+    const user = await userModel.findOne({ qrToken: token });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (!user.checkIn) {
+      return res.status(400).json({ message: "No check-in record found" });
+    }
+
+    const checkOutTime = new Date();
+    const checkInTime = user.checkIn;
+    const durationMs = checkOutTime - checkInTime;
+    const durationHours = durationMs / (1000 * 60 * 60);
+    const roundedHours = Math.ceil(durationHours);
+    const amountCharged = Math.max(20, Math.round(roundedHours * 20));
+
+    user.logs.push({
+      checkIn: checkInTime,
+      checkOut: checkOutTime,
+      duration: roundedHours,
+      amount: amountCharged,
+    });
+
+    user.status = false;
+    user.checkOut = checkOutTime;
+    user.checkIn = null;
+
+    await user.save();
+
+    return res.status(200).json({
+      message: "User has successfully checked out",
+      rate: amountCharged,
+    });
+  } catch (error) {
+    console.error("Error during check-out:", error.message);
+    return res.status(500).json({ message: "Internal Server Error", error: error.message });
+  }
 };
 
-
-//Check current status of a user
-//Check current status of a user
+// Check parking status
 export const checkStatus = async (req, res) => {
-    try {
-      const { qrcodeUrl, l_no } = req.body;
-  
-      let user;
-  
-      // Prioritize QR Code if provided
-      if (qrcodeUrl) {
-        const userData = await decodeQRCode(qrcodeUrl);
-        user = await userModel.findOne({ l_no: userData.l_no });
-      } 
-      // Fallback to manual license number
-      else if (l_no) {
-        user = await userModel.findOne({ l_no });
-      } 
-      // Neither provided
-      else {
-        return res.status(400).json({ message: "Either QR code or License number is required" });
-      }
-  
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-  
-      return res.status(200).json({
-        name: user.name,
-        license_plate: user.l_no,
-        phone: user.p_no,
-        isParked: user.status,
-        currentCheckIn: user.checkIn || null,
-        logs: user.logs.map(log => ({
-          checkIn: log.checkIn,
-          checkOut: log.checkOut,
-          duration: log.duration,
-          amount: log.amount, 
-        })) || [],
-      });
-      
-    } catch (error) {
-      console.log("Error while checking status", error.message);
-      return res.status(500).json({ message: "Internal Server Error", error: error.message });
+  try {
+    const { qrcodeUrl, l_no } = req.body;
+    let user;
+
+    if (qrcodeUrl) {
+      const { token } = await decodeQRCode(qrcodeUrl);
+      user = await userModel.findOne({ qrToken: token });
+    } else if (l_no) {
+      user = await userModel.findOne({ l_no });
+    } else {
+      return res.status(400).json({ message: "Either QR code or License number is required" });
     }
-  };
-  
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({
+      name: user.name,
+      license_plate: user.l_no,
+      phone: user.p_no,
+      isParked: user.status,
+      currentCheckIn: user.checkIn || null,
+      logs: user.logs.map(log => ({
+        checkIn: log.checkIn,
+        checkOut: log.checkOut,
+        duration: log.duration,
+        amount: log.amount,
+      })) || [],
+    });
+  } catch (error) {
+    console.error("Error while checking status:", error.message);
+    return res.status(500).json({ message: "Internal Server Error", error: error.message });
+  }
+};
