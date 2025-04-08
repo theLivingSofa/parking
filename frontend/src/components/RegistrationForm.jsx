@@ -455,7 +455,7 @@ function RegistrationForm() {
                   value={formData.p_no}
                   onChange={handleChange}
                   className="pl-10 p-2 w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                  placeholder="Eg. 9876543210"
+                  placeholder="EG. 9876543210"
                 />
               </div>
             </div>
