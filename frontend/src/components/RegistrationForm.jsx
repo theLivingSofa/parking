@@ -338,7 +338,7 @@ function RegistrationForm() {
   }
 
     try {
-      const response = await axios.post("https://parking-production-735c.up.railway.app/api/register", formData);
+      const response = await axios.post("https://parking-ja7o.onrender.com", formData);
       setQrCode(response.data.user.qrcodeUrl);
       setError('');
     } catch (err) {
