@@ -18,7 +18,7 @@ A modern and efficient **Web-Based Parking Management System** that allows vehic
 
 ## 🌐 Live Deployment
 - **Frontend**: Hosted on [Vercel](https://vercel.com/)
-- **Backend**: Hosted on [Railway](https://railway.app/)
+- **Backend**: Hosted on [Render](https://render.com/)
 - **Database**: MongoDB Atlas (Cloud)
 
 ---
